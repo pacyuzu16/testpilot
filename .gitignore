@@ -145,3 +145,7 @@ booking_system_rest/.venv/
 galaxium-booking-web-app/.venv/
 architecture/.$galaxim-travel-infrastructure.drawio.dtmp
 architecture/.$galaxim-travel-infrastructure.drawio.bkp
+.venv/
+__pycache__/
+.coverage
+node_modules/
