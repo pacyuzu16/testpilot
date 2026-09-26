@@ -135,6 +135,35 @@ Use the test-gap-hunter skill on booking_system_frontend.
 
 Bob will measure, plan, fix, verify, and write `docs/RESULTS.md` automatically.
 
+### Dashboard
+
+The TestPilot Dashboard visualises before/after coverage, KPI cards with animated counters, a per-file coverage table (sortable, colour-coded), the bugs TestPilot found, a pipeline diagram, and a run history chart.
+
+```bash
+# 1. Generate report data (requires backend venv + Node in PATH)
+python3 scripts/testpilot_scan.py
+
+# 2. Start the dashboard dev server
+cd testpilot_dashboard
+npm install
+npm run dev          # → http://localhost:5173/testpilot/
+```
+
+The dev server exposes a **Run scan** button at `/api/scan` that streams live output from `testpilot_scan.py` into a terminal panel and reloads the report.
+In the production build the button is replaced by a "Static report" badge.
+
+```bash
+# Run dashboard tests
+npm run test:run
+
+# Production build (outputs to testpilot_dashboard/dist/)
+npm run build
+```
+
+The dashboard is deployed to GitHub Pages on every push to `main` via [`.github/workflows/dashboard-pages.yml`](.github/workflows/dashboard-pages.yml).
+
+---
+
 ### CI (GitHub Actions)
 
 Every pull request triggers [`.github/workflows/testpilot.yml`](.github/workflows/testpilot.yml):

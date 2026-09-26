@@ -104,3 +104,32 @@ Use the test-gap-hunter skill. docs/RESULTS.md lists 2 real bugs found in Run 2:
 Fix both bugs in the app code, update the tests so they assert the correct behaviour (false and 'N/A'),
 run all frontend tests, and add a "Run 3 — Bug fixes" section to docs/RESULTS.md.
 ```
+
+---
+
+## Step 9 — TestPilot Dashboard (NEW task, mode: **Agent**)
+
+```
+Build a TestPilot Dashboard so people can SEE what TestPilot does. Read docs/BASELINE.md and docs/RESULTS.md first.
+
+1. SCAN SCRIPT — scripts/testpilot_scan.py (Python, stdlib only):
+   - Runs backend: `pytest --cov=. --cov-report=json` in booking_system_backend, captures pass/fail counts and warning count.
+   - Runs frontend: `npx vitest run --reporter=json` in booking_system_frontend, captures pass/fail counts.
+   - Writes testpilot_dashboard/public/report.json: timestamp, backend {tests, passed, failed, warnings, coverage_total, files:[{name, coverage}]}, frontend {test_files, tests, passed, failed}, bugs (from docs/RESULTS.md: id, file, title, status fixed), and a "baseline" object with the before numbers from docs/BASELINE.md.
+   - Appends a summary entry to testpilot_dashboard/public/history.json (keep last 20 runs).
+
+2. DASHBOARD — new app testpilot_dashboard/ (Vite + React + TypeScript + Tailwind + framer-motion + lucide-react, same versions as booking_system_frontend):
+   - Header: TestPilot logo/name, "Last scan: <time ago>", theme toggle (Light / Dark / System) saved in localStorage, defaults to system preference, no flash on load.
+   - Hero KPI cards with animated counters and before → after: Backend coverage, Backend tests, Deprecation warnings, Frontend tests, Bugs found / fixed.
+   - Per-file coverage table: before vs after bars, sortable, colour-coded (red <60, amber <90, green ≥90). On mobile it becomes stacked cards.
+   - "Bugs TestPilot found" cards: file, description, status badge (Fixed).
+   - "How it works" pipeline: Measure → Plan → Parallel subagents (backend + frontend) → Verify → Report, as a responsive horizontal/vertical stepper.
+   - Run history chart (simple SVG line chart of coverage and test count over runs).
+   - "Run scan" button: add a Vite dev-server plugin with POST /api/scan that runs scripts/testpilot_scan.py, streams its log into a live terminal-style panel, then reloads report.json. In the production build hide the button and show "Static report" instead.
+   - Design: modern, clean, accessible (WCAG AA contrast in BOTH themes, focus rings, aria labels, keyboard navigable), respects prefers-reduced-motion, fully responsive at 360px / 768px / 1280px, no horizontal scroll on phones, empty and loading and error states.
+   - Add Vitest tests for the theme toggle and the coverage colour logic.
+
+3. DEPLOY — .github/workflows/dashboard-pages.yml: on push to main, build testpilot_dashboard (base path /testpilot/) and deploy to GitHub Pages. Use Node 24.
+
+4. Run the scan once so report.json and history.json are real, run the dashboard tests, run `npm run build`, and add a "Dashboard" section to README.md with how to run it: `python3 scripts/testpilot_scan.py` then `cd testpilot_dashboard && npm install && npm run dev`.
+```

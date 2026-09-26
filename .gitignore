@@ -148,3 +148,5 @@ architecture/.$galaxim-travel-infrastructure.drawio.bkp
 __pycache__/
 .coverage
 node_modules/
+coverage.json
+.claude/
