@@ -1,233 +1,167 @@
-# 🚀 Galaxium Travels - Interplanetary Booking System
+# TestPilot
 
-A complete full-stack application for booking interplanetary space travel, featuring a modern React frontend and a FastAPI backend with dual REST and MCP protocol support.
-
-## 🌟 Features
-
-- **Modern Space-Themed UI** - Beautiful, responsive interface with animated starfield
-- **Full Booking System** - Browse flights, make bookings, manage reservations
-- **Dual Protocol Backend** - REST API and MCP (Model Context Protocol) support
-- **Type-Safe** - Full TypeScript frontend and Python type hints
-- **Real-Time Updates** - Live flight availability and booking status
-- **User Management** - Simple name/email authentication
-- **Production Ready** - Optimized builds and comprehensive error handling
-
-## 🏗️ Architecture
-
-```
-galaxium-travels-infrastructure/
-├── booking_system_backend/     # FastAPI backend (Python)
-│   ├── server.py              # Main server with REST & MCP
-│   ├── services/              # Business logic layer
-│   ├── models.py              # SQLAlchemy ORM models
-│   └── tests/                 # Test suite
-│
-├── booking_system_frontend/    # React frontend (TypeScript)
-│   ├── src/
-│   │   ├── components/        # Reusable UI components
-│   │   ├── pages/            # Route pages
-│   │   ├── services/         # API integration
-│   │   └── types/            # TypeScript definitions
-│   └── dist/                 # Production build
-│
-├── start.sh                   # Unix/Mac startup script
-└── start.bat                  # Windows startup script
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Python 3.8+** - [Download](https://www.python.org/downloads/)
-- **Node.js 18+** - [Download](https://nodejs.org/)
-- **npm** (comes with Node.js)
-
-### Option 1: One-Command Start (Recommended)
-
-#### On macOS/Linux:
-```bash
-./start.sh
-```
-
-#### On Windows:
-```bash
-start.bat
-```
-
-This will automatically:
-- ✅ Install all dependencies
-- ✅ Start the backend server on port 8080
-- ✅ Start the frontend dev server on port 5173
-- ✅ Open both in separate terminal windows
-
-### Option 2: Manual Start
-
-#### Start Backend:
-```bash
-cd booking_system_backend
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python server.py
-```
-
-#### Start Frontend (in a new terminal):
-```bash
-cd booking_system_frontend
-npm install
-npm run dev
-```
-
-## 🌐 Access the Application
-
-Once started, access:
-
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8080
-- **API Documentation**: http://localhost:8080/docs
-- **MCP Endpoint**: http://localhost:8080/mcp
-
-## 📚 Documentation
-
-### Backend
-See [booking_system_backend/README.md](booking_system_backend/README.md) for:
-- API endpoints documentation
-- MCP tools reference
-- Database schema
-- Testing instructions
-
-### Frontend
-See [booking_system_frontend/README.md](booking_system_frontend/README.md) for:
-- Component documentation
-- Styling guide
-- Build instructions
-- Deployment options
-
-## 🎯 User Guide
-
-### Booking a Flight
-
-1. **Browse Flights** - Navigate to the Flights page to see all available routes
-2. **Search & Filter** - Use the search bar to find specific destinations
-3. **Sign In/Register** - Click "Book Now" and enter your name and email
-4. **Confirm Booking** - Review flight details and confirm your reservation
-5. **Manage Bookings** - View and cancel bookings from "My Bookings" page
-
-### Demo Data
-
-The system comes pre-seeded with:
-- **10 Users** - Alice, Bob, Charlie, Diana, Eve, Frank, Grace, Heidi, Ivan, Judy
-- **10 Flights** - Routes between Earth, Mars, Moon, Venus, Jupiter, Europa, Pluto
-- **20 Sample Bookings** - Various booking statuses
-
-## 🛠️ Technology Stack
-
-### Backend
-- **FastAPI** - Modern Python web framework
-- **SQLAlchemy** - ORM for database operations
-- **Pydantic** - Data validation
-- **FastMCP** - MCP protocol support
-- **SQLite** - Lightweight database
-- **Uvicorn** - ASGI server
-
-### Frontend
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **Framer Motion** - Animations
-- **React Router** - Routing
-- **Axios** - HTTP client
-- **React Hot Toast** - Notifications
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-cd booking_system_backend
-pytest
-```
-
-### Frontend Build Test
-```bash
-cd booking_system_frontend
-npm run build
-```
-
-## 📦 Production Deployment
-
-### Backend
-```bash
-cd booking_system_backend
-pip install -r requirements.txt
-uvicorn server:app --host 0.0.0.0 --port 8080
-```
-
-### Frontend
-```bash
-cd booking_system_frontend
-npm run build
-# Deploy the 'dist' folder to your hosting service
-```
-
-### Docker Support
-Both backend and frontend include Dockerfiles for containerized deployment.
-
-## 🎨 Customization
-
-### Change API URL
-Edit `booking_system_frontend/.env`:
-```env
-VITE_API_URL=https://your-api-url.com
-```
-
-### Modify Theme Colors
-Edit `booking_system_frontend/tailwind.config.js`:
-```js
-colors: {
-  'cosmic-purple': '#6366F1',
-  'nebula-pink': '#EC4899',
-  // Add your colors
-}
-```
-
-## 🐛 Troubleshooting
-
-### Backend won't start
-- Ensure Python 3.8+ is installed: `python --version`
-- Check if port 8080 is available
-- Verify all dependencies are installed: `pip install -r requirements.txt`
-
-### Frontend won't start
-- Ensure Node.js 18+ is installed: `node --version`
-- Check if port 5173 is available
-- Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
-
-### Connection Issues
-- Verify backend is running on http://localhost:8080
-- Check CORS settings in backend
-- Ensure `.env` file exists in frontend with correct API URL
-
-## 📄 License
-
-This project is part of the Galaxium Travels booking system.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📧 Support
-
-For issues or questions:
-- Check the documentation in each component's README
-- Review the troubleshooting section above
-- Open an issue on GitHub
+**Automated test coverage improvement and code-health reporting, powered by IBM Bob.**
 
 ---
 
-**Built with ❤️ for space travelers** 🚀✨
+## Problem
 
-*Explore the cosmos, one booking at a time!*
+Real-world projects accumulate test debt silently. Coverage drops file by file. Deprecation warnings pile up across releases. Setting up a test runner from scratch takes hours. And when someone finally audits the gaps, writing the tests, fixing the warnings, and reporting the before/after numbers is tedious, repetitive work that nobody wants to do—so it never gets done.
+
+---
+
+## Solution
+
+TestPilot is a Bob-native automation layer that treats test improvement as a first-class engineering task. It ships as:
+
+- A **custom mode** (`🧪 TestPilot`) with the right tool permissions and a persona that refuses to change application behaviour just to make a test pass.
+- A **skill** (`test-gap-hunter`) that encodes the full five-step improvement workflow.
+- A **GitHub Actions workflow** that enforces the coverage floor on every pull request.
+
+One command in Bob — `Use the test-gap-hunter skill on booking_system_backend` — goes from baseline measurement to a written `docs/RESULTS.md` report with no manual steps.
+
+---
+
+## How it works
+
+### 1. Custom mode — `🧪 TestPilot`
+
+Defined in [`.bob/custom_modes.yaml`](.bob/custom_modes.yaml). The mode sets a strict engineering persona and a `customInstructions` rule:
+
+> *Never change application behaviour just to make a test pass. Always run the tests after writing them. Always record before/after numbers in `docs/RESULTS.md`.*
+
+Tool groups granted: `read`, `edit`, `execute`, `skill`, `todo`, `subagent`.
+
+### 2. Skill — `test-gap-hunter`
+
+Defined in [`.bob/skills/test-gap-hunter/SKILL.md`](.bob/skills/test-gap-hunter/SKILL.md). The skill encodes a five-step workflow that runs every time:
+
+| Step | What happens |
+|---|---|
+| **1 — Measure** | Runs the test suite with `--cov` and `-W all`; records baseline numbers |
+| **2 — Plan** | Ranks gaps by risk: untested endpoints → service functions → UI logic → deprecations |
+| **3 — Fix in parallel** | Spawns one subagent per layer (backend / frontend) so both work simultaneously |
+| **4 — Verify** | Re-runs all tests; fixes wrong tests, flags real bugs without touching app code |
+| **5 — Report** | Writes `docs/RESULTS.md` with a before/after table and a bug list |
+
+A companion [`.bob/skills/test-gap-hunter/checklist.md`](.bob/skills/test-gap-hunter/checklist.md) defines what a good test must include (arrange/act/assert, one behaviour per test, no network calls, edge cases).
+
+### 3. Parallel subagents
+
+In the Fix step, Bob spawns two independent subagents via `spawn_subagent` with `fork_context: true`:
+
+- **Backend subagent** — works in `booking_system_backend/`, adds pytest tests, fixes deprecations at the call site (no suppression), runs `pytest` after each change.
+- **Frontend subagent** — works in `booking_system_frontend/`, installs Vitest + React Testing Library if missing, mocks `src/services/api.ts` at the module level, runs `npm test -- --run` after each component.
+
+Both run concurrently and report back independently, cutting wall-clock time roughly in half.
+
+---
+
+## Results
+
+Full details: [`docs/RESULTS.md`](docs/RESULTS.md)
+
+### Backend (Run 1)
+
+| Metric | Before | After |
+|---|---|---|
+| Tests (total) | 29 | **46** |
+| Tests passing | 29 | **46** |
+| Coverage (overall) | 86% | **95%** |
+| `server.py` coverage | 59% | **100%** |
+| Deprecation warnings | 6 | **0** |
+
+### Frontend (Run 2)
+
+| Metric | Before | After |
+|---|---|---|
+| Test files | 0 | **5** |
+| Tests (total) | 0 | **56** |
+| Tests passing | 0 | **56** |
+| Test runner | none | **Vitest 5.0 + RTL** |
+
+2 real application bugs were found and documented (not silently fixed): a wrong return type in `isErrorResponse` and a dead `try/catch` in `calculateDuration`. See [`docs/RESULTS.md`](docs/RESULTS.md#bugs-found----run-2).
+
+---
+
+## How to run it
+
+### Prerequisites
+
+- Python 3.8+
+- Node.js 18+
+- IBM Bob
+
+### Start the application
+
+```bash
+# macOS / Linux
+./start.sh
+
+# Windows
+start.bat
+```
+
+Starts the FastAPI backend on `http://localhost:8080` and the React frontend on `http://localhost:5173`.
+
+### Run the tests manually
+
+```bash
+# Backend (from booking_system_backend/)
+cd booking_system_backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt pytest-cov
+pytest --cov=. --cov-report=term-missing
+
+# Frontend (from booking_system_frontend/)
+cd booking_system_frontend
+npm ci
+npm test -- --run
+```
+
+### Run TestPilot via Bob
+
+Switch to the `🧪 TestPilot` mode in Bob, then:
+
+```
+Use the test-gap-hunter skill on booking_system_backend.
+```
+
+or
+
+```
+Use the test-gap-hunter skill on booking_system_frontend.
+```
+
+Bob will measure, plan, fix, verify, and write `docs/RESULTS.md` automatically.
+
+### CI (GitHub Actions)
+
+Every pull request triggers [`.github/workflows/testpilot.yml`](.github/workflows/testpilot.yml):
+
+- **Backend job** — runs pytest with `--cov-fail-under=95` and treats deprecation warnings as errors.
+- **Frontend job** — runs `npm test -- --run --reporter=verbose`.
+
+Both jobs run in parallel. A coverage drop or any new deprecation warning fails the PR.
+
+---
+
+## Bob usage evidence
+
+Live Bob session recordings are in [`bob_sessions/`](bob_sessions/). These show the full TestPilot workflow running end-to-end inside Bob: mode creation, skill invocation, parallel subagent dispatch, and report generation.
+
+---
+
+## Data sources
+
+See [`DATA_SOURCES.md`](DATA_SOURCES.md).
+
+The sample application TestPilot runs on is [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels) (`bob-learning-path-branch`), an interplanetary booking system with a FastAPI backend and a React frontend. All user and flight records are fictional seed data. No personal or confidential information is used.
+
+---
+
+## Credits
+
+- **Built on:** [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels) — Apache-2.0
+- **Powered by:** [IBM Bob](https://www.ibm.com/bob)
+- **License:** [Apache-2.0](LICENSE)

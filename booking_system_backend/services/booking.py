@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, UTC
 from models import User, Flight, Booking
 from schemas import BookingOut, ErrorResponse
 
@@ -46,7 +46,7 @@ def book_flight(db: Session, user_id: int, name: str, flight_id: int) -> Booking
         user_id=user_id,
         flight_id=flight_id,
         status="booked",
-        booking_time=datetime.utcnow().isoformat()
+        booking_time=datetime.now(UTC).isoformat()
     )
     db.add(new_booking)
     db.commit()

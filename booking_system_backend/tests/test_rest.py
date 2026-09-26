@@ -135,6 +135,60 @@ class TestBookEndpoint:
         assert data["success"] == False
         assert data["error_code"] == "FLIGHT_NOT_FOUND"
 
+    def test_book_flight_no_seats_available(self, client, db_session, sample_user_data):
+        """Test booking a flight with no seats available."""
+        # Arrange
+        user_response = client.post("/register", json=sample_user_data)
+        user_id = user_response.json()["user_id"]
+
+        db_session.add(Flight(
+            origin="Earth", destination="Mars",
+            departure_time="2099-01-01T09:00:00Z", arrival_time="2099-01-01T17:00:00Z",
+            price=1000000, seats_available=0
+        ))
+        db_session.commit()
+        flight = db_session.query(Flight).first()
+
+        # Act
+        response = client.post("/book", json={
+            "user_id": user_id,
+            "name": sample_user_data["name"],
+            "flight_id": flight.flight_id
+        })
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] == False
+        assert data["error_code"] == "NO_SEATS_AVAILABLE"
+
+    def test_book_flight_name_mismatch(self, client, db_session, sample_user_data):
+        """Test booking when the provided name does not match the registered name."""
+        # Arrange
+        user_response = client.post("/register", json=sample_user_data)
+        user_id = user_response.json()["user_id"]
+
+        db_session.add(Flight(
+            origin="Earth", destination="Mars",
+            departure_time="2099-01-01T09:00:00Z", arrival_time="2099-01-01T17:00:00Z",
+            price=1000000, seats_available=5
+        ))
+        db_session.commit()
+        flight = db_session.query(Flight).first()
+
+        # Act
+        response = client.post("/book", json={
+            "user_id": user_id,
+            "name": "Wrong Name",
+            "flight_id": flight.flight_id
+        })
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] == False
+        assert data["error_code"] == "NAME_MISMATCH"
+
 
 class TestBookingsEndpoint:
     """Test /bookings/{user_id} endpoint."""
@@ -220,6 +274,36 @@ class TestCancelEndpoint:
         data = response.json()
         assert data["success"] == False
         assert data["error_code"] == "BOOKING_NOT_FOUND"
+
+    def test_cancel_booking_already_cancelled(self, client, db_session, sample_user_data):
+        """Test cancelling a booking that is already cancelled."""
+        # Arrange
+        user_response = client.post("/register", json=sample_user_data)
+        user_id = user_response.json()["user_id"]
+
+        db_session.add(Flight(
+            origin="Earth", destination="Mars",
+            departure_time="2099-01-01T09:00:00Z", arrival_time="2099-01-01T17:00:00Z",
+            price=1000000, seats_available=5
+        ))
+        db_session.commit()
+        flight = db_session.query(Flight).first()
+
+        db_session.add(Booking(
+            user_id=user_id, flight_id=flight.flight_id,
+            status="cancelled", booking_time="2099-01-01T10:00:00Z"
+        ))
+        db_session.commit()
+        booking_obj = db_session.query(Booking).first()
+
+        # Act
+        response = client.post(f"/cancel/{booking_obj.booking_id}")
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] == False
+        assert data["error_code"] == "ALREADY_CANCELLED"
 
 
 class TestHealthEndpoint:

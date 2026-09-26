@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
 
 
@@ -11,8 +11,7 @@ class FlightOut(BaseModel):
     price: int
     seats_available: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class BookingRequest(BaseModel):
@@ -28,8 +27,7 @@ class BookingOut(BaseModel):
     status: str
     booking_time: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserRegistration(BaseModel):
@@ -42,8 +40,7 @@ class UserOut(BaseModel):
     name: str
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ErrorResponse(BaseModel):

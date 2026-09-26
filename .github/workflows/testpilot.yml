@@ -1,0 +1,71 @@
+name: TestPilot CI
+
+on:
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  backend:
+    name: Backend tests + coverage
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: booking_system_backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: booking_system_backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest-cov
+
+      - name: Run tests with coverage
+        # --fail-under=95 matches the "After" total in docs/RESULTS.md Run 1.
+        # Treat deprecation warnings as errors so regressions are visible.
+        run: |
+          pytest \
+            --cov=. \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-fail-under=95 \
+            --tb=short \
+            -W error::DeprecationWarning \
+            -W error::PendingDeprecationWarning \
+            -W error::sqlalchemy.exc.MovedIn20Warning
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: booking_system_backend/coverage.xml
+          retention-days: 14
+
+  frontend:
+    name: Frontend Vitest tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: booking_system_frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: booking_system_frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Vitest
+        run: npm test -- --run --reporter=verbose

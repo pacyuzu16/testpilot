@@ -12,48 +12,31 @@ All commands must be run from their respective subdirectory — there is no mono
 
 ### Backend (`booking_system_backend/`)
 ```bash
-# Run server
-python server.py   # starts uvicorn on port 8080
-
-# Run all tests (must be run from booking_system_backend/)
-pytest
-
-# Run a single test
-pytest tests/test_rest.py::TestFlightsEndpoint::test_get_flights_empty
-pytest tests/test_services.py -k "test_name"
+pytest                                                          # all tests
+pytest tests/test_rest.py::TestFlightsEndpoint::test_name      # single test by class+name
+pytest tests/test_services.py -k "test_name"                   # single test by keyword
+python server.py                                               # dev server on port 8080
 ```
+`pytest.ini` sets `testpaths = tests` relative to `booking_system_backend/` — running pytest from the repo root will find no tests.
 
 ### Frontend (`booking_system_frontend/`)
 ```bash
-npm run dev      # dev server on port 5173
-npm run build    # tsc -b && vite build
-npm run lint     # eslint
+npm run lint    # eslint (only non-obvious script; dev/build/preview are standard)
 ```
 
 ## Critical Patterns
 
 ### Backend
-- **Tests must run from `booking_system_backend/`**, not the repo root — `pytest.ini` sets `testpaths = tests` relative to that directory.
-- **`conftest.py` patches `SessionLocal` and disables `seed()`** during tests — never call `seed()` in production test paths.
-- Service functions (e.g. `booking.book_flight`) **return `ErrorResponse` instead of raising exceptions**. In REST handlers, return the `ErrorResponse` directly (FastAPI serializes it); in MCP tools, check `isinstance(result, ErrorResponse)` and `raise Exception(...)`.
-- `booking_time` and `departure_time`/`arrival_time` are stored as **plain strings** (not SQLAlchemy DateTime) in models — ISO format, UTC.
-- DB is SQLite (`booking.db` in `booking_system_backend/`); wiped and reseeded on every server startup via `lifespan`.
-- Pydantic schemas use `class Config: from_attributes = True` for ORM model→schema conversion; use `Model.model_validate(orm_obj)` not `Model.from_orm()`.
-- MCP tools in `server.py` open their own `SessionLocal()` sessions (not via `Depends`) — always wrap in `try/finally: db.close()`.
+- **Service functions return `ErrorResponse` on failure — never raise.** REST handlers return the value directly (FastAPI serializes it via the `Union` response model); MCP tools must `isinstance`-check and `raise Exception(result.details or result.error)`.
+- **MCP tools cannot use `Depends`** — they open `SessionLocal()` directly in a `try/finally: db.close()` block. New tools must be decorated with `@mcp.tool()` _before_ `mcp_app = mcp.http_app()` is called.
+- **All datetime columns are `String`** in `models.py` — do not use SQLAlchemy `DateTime`; store ISO 8601 UTC strings.
+- **`seed.py` wipes and replaces all data on every server startup** (explicit `DELETE` before inserting). Seeded `Booking` rows are inserted without decrementing `seats_available` — flight seat counts in a freshly started dev DB may not reflect seeded booking counts.
+- Use `Model.model_validate(orm_obj)` (Pydantic v2) — `from_orm()` is removed.
+- `conftest.py` patches `server.seed` to a no-op and provides a fresh in-memory DB per test function — tests always start empty.
 
 ### Frontend
-- API base URL comes from `VITE_API_URL` env var (`.env` file, not committed); falls back to `http://localhost:8080`.
-- **`isErrorResponse(response)`** helper in `src/services/api.ts` — use it to discriminate `User | ErrorResponse` / `Booking | ErrorResponse` union returns.
-- All shared TypeScript types live in `src/types/index.ts`; frontend field names mirror backend snake_case (e.g. `flight_id`, `booking_time`).
-- The axios instance has a response interceptor that **normalises all errors** to the `ErrorResponse` shape — don't catch raw Axios errors, just catch and check `.error_code`.
-
-## Code Style
-
-### Python (backend)
-- No formatter config found; follow existing style (4-space indent, type hints on all function signatures).
-- Service layer imports: `from models import X` and `from schemas import X` (flat imports, no package prefix — modules are co-located in `booking_system_backend/`).
-
-### TypeScript (frontend)
-- ESLint with `typescript-eslint` recommended + `react-hooks` + `react-refresh` rules.
-- `import type { … }` for type-only imports (see `api.ts`).
-- No Prettier config — match surrounding code style.
+- **`isErrorResponse(response)`** in [`src/services/api.ts`](booking_system_frontend/src/services/api.ts) is the canonical discriminator for `User | ErrorResponse` / `Booking | ErrorResponse` union returns. The axios interceptor normalises all HTTP errors to that shape — catch and check `.error_code`, not raw Axios errors.
+- User session persists in `localStorage` under key `'galaxium_user'` via [`src/hooks/useUser.tsx`](booking_system_frontend/src/hooks/useUser.tsx). `useUser()` throws if called outside `<UserProvider>`.
+- All datetime strings come from the backend as ISO 8601. Use `parseISO` + helpers from [`src/utils/formatters.ts`](booking_system_frontend/src/utils/formatters.ts) (uses `date-fns`) — do not use `new Date(string)` directly.
+- API base URL: `VITE_API_URL` env var (Vite prefix required; plain `API_URL` is ignored); falls back to `http://localhost:8080`. Copy `.env.example` → `.env`.
+- Frontend TypeScript types mirror backend snake_case field names (`flight_id`, `booking_time`, etc.) — see [`src/types/index.ts`](booking_system_frontend/src/types/index.ts).
