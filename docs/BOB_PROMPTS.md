@@ -92,3 +92,15 @@ Rewrite README.md for our hackathon project "TestPilot". Sections: Problem, Solu
 How to run it, Bob usage evidence (link to bob_sessions/), Data sources (link DATA_SOURCES.md),
 Credits (built on IBM/galaxium-travels, Apache-2.0).
 ```
+
+---
+
+## Step 8 — Fix the bugs TestPilot found (NEW task, mode: **🧪 TestPilot**)
+
+```
+Use the test-gap-hunter skill. docs/RESULTS.md lists 2 real bugs found in Run 2:
+1. isErrorResponse in src/services/api.ts returns null/undefined instead of false.
+2. calculateDuration in src/utils/formatters.ts returns 'NaNh NaNm' instead of 'N/A' for invalid dates.
+Fix both bugs in the app code, update the tests so they assert the correct behaviour (false and 'N/A'),
+run all frontend tests, and add a "Run 3 — Bug fixes" section to docs/RESULTS.md.
+```
