@@ -81,6 +81,9 @@ export const calculateDuration = (
   try {
     const departure = parseISO(departureTime);
     const arrival = parseISO(arrivalTime);
+    if (isNaN(departure.getTime()) || isNaN(arrival.getTime())) {
+      return 'N/A';
+    }
     const diffInHours = (arrival.getTime() - departure.getTime()) / (1000 * 60 * 60);
     
     if (diffInHours < 1) {

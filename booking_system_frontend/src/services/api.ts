@@ -109,7 +109,7 @@ export const cancelBooking = async (
 export const isErrorResponse = (
   response: any
 ): response is ErrorResponse => {
-  return response && response.success === false;
+  return response != null && response.success === false;
 };
 
 /**

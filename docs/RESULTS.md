@@ -118,3 +118,37 @@ Scope: Install Vitest + RTL from zero; test `services/api.ts`, `utils/formatters
 | `components/bookings/BookingCard.tsx` | Out of scope for this run |
 | `components/user/UserIdentification.tsx` | Out of scope for this run |
 | `components/layout/Header.tsx`, `Footer.tsx`, `Layout.tsx` | Presentational; lower priority |
+
+---
+
+## Run 3 — Bug fixes (2026-09-25)
+
+Scope: Fix the 2 bugs documented in Run 2, update their tests to assert correct behaviour, verify the full frontend suite still passes.
+
+### Bugs fixed
+
+| # | File | Location | Bug | Fix |
+|---|---|---|---|---|
+| 1 | `src/services/api.ts` | line 112 | `isErrorResponse` returned `null`/`undefined` (not `false`) for nullish inputs, violating its `boolean` return type | Changed guard to `response != null && response.success === false` so `null` and `undefined` both produce strict `false` |
+| 2 | `src/utils/formatters.ts` | lines 84–85 | `calculateDuration` produced `'NaNh NaNm'` for invalid date strings because `parseISO` silently returns `Invalid Date` instead of throwing | Added `isNaN(departure.getTime()) \|\| isNaN(arrival.getTime())` guard that returns `'N/A'` before arithmetic |
+
+### Test assertions corrected
+
+| Test file | Test name | Before (documenting wrong behaviour) | After (asserting correct behaviour) |
+|---|---|---|---|
+| `src/services/__tests__/api.test.ts` | `isErrorResponse — returns false for null` | `toBeFalsy()` | `toBe(false)` |
+| `src/services/__tests__/api.test.ts` | `isErrorResponse — returns false for undefined` | `toBeFalsy()` | `toBe(false)` |
+| `src/utils/__tests__/formatters.test.ts` | `calculateDuration — returns N/A for invalid input` | `toBe('NaNh NaNm')` | `toBe('N/A')` |
+
+### Before / After
+
+| Metric | Before (Run 2) | After (Run 3) |
+|---|---|---|
+| Frontend test files | 5 | **5** |
+| Frontend tests (total) | 56 | **56** |
+| Frontend tests passing | 56 | **56** |
+| Known bugs in app code | 2 | **0** |
+
+### Remaining gaps
+
+Same as Run 2 — page-level components (`Flights.tsx`, `MyBookings.tsx`, `Home.tsx`), `BookingCard.tsx`, `UserIdentification.tsx`, and presentational layout components are not yet covered.

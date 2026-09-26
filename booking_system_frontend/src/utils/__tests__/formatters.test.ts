@@ -127,8 +127,6 @@ describe('calculateDuration', () => {
   });
 
   it('returns N/A for invalid input', () => {
-    // parseISO('bad') returns Invalid Date without throwing, so NaN propagates
-    // through the arithmetic — this is a known source bug.
-    expect(calculateDuration('bad', 'input')).toBe('NaNh NaNm');
+    expect(calculateDuration('bad', 'input')).toBe('N/A');
   });
 });

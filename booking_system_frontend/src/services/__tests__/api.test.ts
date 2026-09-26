@@ -61,11 +61,11 @@ describe('isErrorResponse', () => {
   });
 
   it('returns false for null', () => {
-    expect(isErrorResponse(null)).toBeFalsy();
+    expect(isErrorResponse(null)).toBe(false);
   });
 
   it('returns false for undefined', () => {
-    expect(isErrorResponse(undefined)).toBeFalsy();
+    expect(isErrorResponse(undefined)).toBe(false);
   });
 });
 
