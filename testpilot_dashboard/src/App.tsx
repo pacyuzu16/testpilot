@@ -67,7 +67,7 @@ export default function App() {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold">Coverage Dashboard</h1>
+            <h2 className="text-2xl font-bold">Coverage Dashboard</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               Before &amp; after TestPilot — {bugs.length} bug{bugs.length !== 1 ? 's' : ''} found, all fixed
             </p>
