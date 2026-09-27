@@ -15,8 +15,8 @@ const STEPS = [
   },
   {
     icon: <Cpu size={20} />,
-    title: 'Parallel subagents',
-    desc: 'Backend subagent + frontend subagent run concurrently, cutting wall-clock time in half.',
+    title: 'Fix',
+    desc: 'Write the missing tests and update outdated code; backend and frontend can go to separate Bob subagents.',
     highlight: true,
   },
   {

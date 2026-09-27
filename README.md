@@ -1,196 +1,133 @@
-# TestPilot
+# 🧪 TestPilot
 
-**Automated test coverage improvement and code-health reporting, powered by IBM Bob.**
+**An IBM Bob custom mode + skill that finds untested and outdated code, writes the missing tests, fixes deprecations, and proves the result with before/after numbers.**
 
----
+[![Live dashboard](https://img.shields.io/badge/Live%20dashboard-pacyuzu16.github.io%2Ftestpilot-6366f1)](https://pacyuzu16.github.io/testpilot/)
+[![TestPilot CI](https://github.com/pacyuzu16/testpilot/actions/workflows/testpilot.yml/badge.svg)](https://github.com/pacyuzu16/testpilot/actions/workflows/testpilot.yml)
+[![Built with IBM Bob](https://img.shields.io/badge/Built%20with-IBM%20Bob-0f62fe)](https://bob.ibm.com)
 
-## Problem
+**👉 See it: [pacyuzu16.github.io/testpilot](https://pacyuzu16.github.io/testpilot/)**
 
-Real-world projects accumulate test debt silently. Coverage drops file by file. Deprecation warnings pile up across releases. Setting up a test runner from scratch takes hours. And when someone finally audits the gaps, writing the tests, fixing the warnings, and reporting the before/after numbers is tedious, repetitive work that nobody wants to do—so it never gets done.
-
----
-
-## Solution
-
-TestPilot is a Bob-native automation layer that treats test improvement as a first-class engineering task. It ships as:
-
-- A **custom mode** (`🧪 TestPilot`) with the right tool permissions and a persona that refuses to change application behaviour just to make a test pass.
-- A **skill** (`test-gap-hunter`) that encodes the full five-step improvement workflow.
-- A **GitHub Actions workflow** that enforces the coverage floor on every pull request.
-
-One command in Bob — `Use the test-gap-hunter skill on booking_system_backend` — goes from baseline measurement to a written `docs/RESULTS.md` report with no manual steps.
-
----
-
-## How it works
-
-### 1. Custom mode — `🧪 TestPilot`
-
-Defined in [`.bob/custom_modes.yaml`](.bob/custom_modes.yaml). The mode sets a strict engineering persona and a `customInstructions` rule:
-
-> *Never change application behaviour just to make a test pass. Always run the tests after writing them. Always record before/after numbers in `docs/RESULTS.md`.*
-
-Tool groups granted: `read`, `edit`, `execute`, `skill`, `todo`, `subagent`.
-
-### 2. Skill — `test-gap-hunter`
-
-Defined in [`.bob/skills/test-gap-hunter/SKILL.md`](.bob/skills/test-gap-hunter/SKILL.md). The skill encodes a five-step workflow that runs every time:
-
-| Step | What happens |
-|---|---|
-| **1 — Measure** | Runs the test suite with `--cov` and `-W all`; records baseline numbers |
-| **2 — Plan** | Ranks gaps by risk: untested endpoints → service functions → UI logic → deprecations |
-| **3 — Fix in parallel** | Spawns one subagent per layer (backend / frontend) so both work simultaneously |
-| **4 — Verify** | Re-runs all tests; fixes wrong tests, flags real bugs without touching app code |
-| **5 — Report** | Writes `docs/RESULTS.md` with a before/after table and a bug list |
-
-A companion [`.bob/skills/test-gap-hunter/checklist.md`](.bob/skills/test-gap-hunter/checklist.md) defines what a good test must include (arrange/act/assert, one behaviour per test, no network calls, edge cases).
-
-### 3. Parallel subagents
-
-In the Fix step, Bob spawns two independent subagents via `spawn_subagent` with `fork_context: true`:
-
-- **Backend subagent** — works in `booking_system_backend/`, adds pytest tests, fixes deprecations at the call site (no suppression), runs `pytest` after each change.
-- **Frontend subagent** — works in `booking_system_frontend/`, installs Vitest + React Testing Library if missing, mocks `src/services/api.ts` at the module level, runs `npm test -- --run` after each component.
-
-Both run concurrently and report back independently, cutting wall-clock time roughly in half.
-
----
-
-## Results
-
-Full details: [`docs/RESULTS.md`](docs/RESULTS.md)
-
-### Backend (Run 1)
-
-| Metric | Before | After |
+| | Before | After |
 |---|---|---|
-| Tests (total) | 29 | **46** |
-| Tests passing | 29 | **46** |
-| Coverage (overall) | 86% | **95%** |
+| Backend coverage | 86% | **95%** |
 | `server.py` coverage | 59% | **100%** |
+| Backend tests | 29 | **46** |
 | Deprecation warnings | 6 | **0** |
-
-### Frontend (Run 2)
-
-| Metric | Before | After |
-|---|---|---|
-| Test files | 0 | **5** |
-| Tests (total) | 0 | **56** |
-| Tests passing | 0 | **56** |
-| Test runner | none | **Vitest 5.0 + RTL** |
-
-2 real application bugs were found and documented (not silently fixed): a wrong return type in `isErrorResponse` and a dead `try/catch` in `calculateDuration`. See [`docs/RESULTS.md`](docs/RESULTS.md#bugs-found----run-2).
+| Frontend tests | 0 (no test runner) | **56** |
+| Real bugs found → fixed | – | **2 → 2** |
 
 ---
 
-## How to run it
+## The problem
 
-### Prerequisites
+Test debt builds up quietly. Coverage slips file by file, deprecation warnings pile up between releases, and some parts of an app never get a test runner at all. Fixing it means measuring the gaps, writing many small tests, updating outdated APIs and reporting what changed — slow, repetitive work that keeps getting postponed.
 
-- Python 3.8+
-- Node.js 18+
-- IBM Bob
+## The solution
 
-### Start the application
+TestPilot packages that whole workflow into IBM Bob so it runs from **one prompt** and gives the same, repeatable result every time:
 
-```bash
-# macOS / Linux
-./start.sh
+| Piece | File | What it does |
+|---|---|---|
+| **Project context** | [`AGENTS.md`](AGENTS.md) | Generated by Bob's `/init`, so Bob knows the stack, commands and gotchas in every conversation |
+| **Custom mode** — 🧪 TestPilot | [`.bob/custom_modes.yaml`](.bob/custom_modes.yaml) | A test-and-maintenance engineer persona. Rule #1: *never change app behaviour just to make a test pass* |
+| **Skill** — `test-gap-hunter` | [`.bob/skills/test-gap-hunter/SKILL.md`](.bob/skills/test-gap-hunter/SKILL.md) | The 5-step workflow below, plus a [test-quality checklist](.bob/skills/test-gap-hunter/checklist.md) |
+| **Scan script** | [`scripts/testpilot_scan.py`](scripts/testpilot_scan.py) | Re-measures everything and writes the dashboard data |
+| **Dashboard** | [`testpilot_dashboard/`](testpilot_dashboard/) | Before/after results, bugs found, and a live **Run scan** button |
+| **CI guard** | [`.github/workflows/testpilot.yml`](.github/workflows/testpilot.yml) | Fails if coverage drops below 95% or a deprecation warning comes back |
 
-# Windows
-start.bat
-```
+### The `test-gap-hunter` workflow
 
-Starts the FastAPI backend on `http://localhost:8080` and the React frontend on `http://localhost:5173`.
+1. **Measure** — run the tests with coverage and count warnings.
+2. **Plan** — rank the gaps by risk: untested API endpoints → UI logic → deprecations.
+3. **Fix** — write the tests and update outdated code. The skill can hand backend and frontend work to separate Bob subagents.
+4. **Verify** — re-run everything. If a test fails because the *app* is wrong, report it as a bug instead of bending the test.
+5. **Report** — write the before/after numbers and any bugs to [`docs/RESULTS.md`](docs/RESULTS.md).
 
-### Run the tests manually
+---
 
-```bash
-# Backend (from booking_system_backend/)
-cd booking_system_backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt pytest-cov
-pytest --cov=. --cov-report=term-missing
+## What happened when we ran it
 
-# Frontend (from booking_system_frontend/)
-cd booking_system_frontend
-npm ci
-npm test -- --run
-```
+Target: [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels), IBM's demo booking app (FastAPI + React). Baseline measured before any change: [`docs/BASELINE.md`](docs/BASELINE.md).
 
-### Run TestPilot via Bob
+- **Run 1 — backend.** 17 new tests (REST edge cases + every MCP tool). `server.py` 59% → 100%. All 6 deprecation warnings fixed at the source (Pydantic v2 `ConfigDict`, SQLAlchemy 2.0 import, timezone-aware `datetime`).
+- **Run 2 — frontend.** Set up Vitest + React Testing Library from nothing and wrote 56 tests for the API client, formatters, user hook, `FlightCard` and `BookingModal`. Found **2 real bugs** and reported them instead of hiding them:
+  1. `calculateDuration` showed **"NaNh NaNm"** to users for an invalid date.
+  2. `isErrorResponse` returned `null`/`undefined` instead of `false`.
+- **Run 3 — bug fixes.** A fresh Bob task in 🧪 TestPilot mode loaded the skill, fixed both bugs, and switched the tests to assert the correct behaviour.
 
-Switch to the `🧪 TestPilot` mode in Bob, then:
+Full per-file tables: [`docs/RESULTS.md`](docs/RESULTS.md).
+
+---
+
+## Try it
+
+**Requirements:** Python 3.11+, Node.js 22+, IBM Bob IDE.
+
+### Use TestPilot in Bob
+
+Open this folder in Bob, pick **🧪 TestPilot** in the mode selector, and send:
 
 ```
 Use the test-gap-hunter skill on booking_system_backend.
 ```
 
-or
+The exact prompts used to build this project, step by step, are in [`docs/BOB_PROMPTS.md`](docs/BOB_PROMPTS.md).
 
-```
-Use the test-gap-hunter skill on booking_system_frontend.
-```
-
-Bob will measure, plan, fix, verify, and write `docs/RESULTS.md` automatically.
-
-### Dashboard
-
-The TestPilot Dashboard visualises before/after coverage, KPI cards with animated counters, a per-file coverage table (sortable, colour-coded), the bugs TestPilot found, a pipeline diagram, and a run history chart.
+### Run the tests yourself
 
 ```bash
-# 1. Generate report data (requires backend venv + Node in PATH)
-python3 scripts/testpilot_scan.py
+cd booking_system_backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+pytest --cov=.
 
-# 2. Start the dashboard dev server
+cd ../booking_system_frontend
+npm ci && npm test -- --run
+```
+
+### Run the dashboard with the live scan button
+
+```bash
+# (after setting up booking_system_backend/.venv and npm ci as above)
 cd testpilot_dashboard
-npm install
-npm run dev          # → http://localhost:5173/testpilot/
+npm ci
+npm run dev        # open the URL Vite prints, e.g. http://localhost:5173/testpilot/
 ```
 
-The dev server exposes a **Run scan** button at `/api/scan` that streams live output from `testpilot_scan.py` into a terminal panel and reloads the report.
-In the production build the button is replaced by a "Static report" badge.
+Click **Run scan**: it runs all 102 tests, streams the log on screen and refreshes the numbers. The public [GitHub Pages version](https://pacyuzu16.github.io/testpilot/) shows the latest committed report (scans need a local machine).
+
+### Run the demo app itself
 
 ```bash
-# Run dashboard tests
-npm run test:run
-
-# Production build (outputs to testpilot_dashboard/dist/)
-npm run build
+./start.sh   # backend on :8080, frontend on :5173
 ```
-
-The dashboard is deployed to GitHub Pages on every push to `main` via [`.github/workflows/dashboard-pages.yml`](.github/workflows/dashboard-pages.yml).
-
----
-
-### CI (GitHub Actions)
-
-Every pull request triggers [`.github/workflows/testpilot.yml`](.github/workflows/testpilot.yml):
-
-- **Backend job** — runs pytest with `--cov-fail-under=95` and treats deprecation warnings as errors.
-- **Frontend job** — runs `npm test -- --run --reporter=verbose`.
-
-Both jobs run in parallel. A coverage drop or any new deprecation warning fails the PR.
 
 ---
 
 ## Bob usage evidence
 
-Live Bob session recordings are in [`bob_sessions/`](bob_sessions/). These show the full TestPilot workflow running end-to-end inside Bob: mode creation, skill invocation, parallel subagent dispatch, and report generation.
+Screenshots of every Bob task session used to build TestPilot are in [`bob_sessions/`](bob_sessions/):
+
+| File | Bob task |
+|---|---|
+| `task00_session_summary` | Session summary of the main build task |
+| `task01_init` | `/init` → `AGENTS.md` |
+| `task02_custom_mode` | Create the 🧪 TestPilot mode |
+| `task03_skill` | Create the `test-gap-hunter` skill |
+| `task04_runing_on_backend` | Run 1 — backend |
+| `task05_runing_on_frontend` | Run 2 — frontend |
+| `task06_github_action_workflows` | CI workflow |
+| `task07_rewriting_readme` | README |
+| `task08_bugfix`, `task08_summary` | Run 3 — fresh task, TestPilot mode, skill loaded, bugs fixed |
+| `task09_dashboard`, `task09_summary` | Dashboard + scan script + GitHub Pages |
 
 ---
 
 ## Data sources
 
-See [`DATA_SOURCES.md`](DATA_SOURCES.md).
+The only data is the open-source [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels) app (Apache-2.0) and its fictional seed data. No personal, client or confidential data. See [`DATA_SOURCES.md`](DATA_SOURCES.md).
 
-The sample application TestPilot runs on is [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels) (`bob-learning-path-branch`), an interplanetary booking system with a FastAPI backend and a React frontend. All user and flight records are fictional seed data. No personal or confidential information is used.
+## Credits & license
 
----
-
-## Credits
-
-- **Built on:** [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels) — Apache-2.0
-- **Powered by:** [IBM Bob](https://www.ibm.com/bob)
-- **License:** [Apache-2.0](LICENSE)
+Built on [IBM/galaxium-travels](https://github.com/IBM/galaxium-travels) (Apache-2.0) with [IBM Bob](https://bob.ibm.com). Licensed under [Apache-2.0](LICENSE).
