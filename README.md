@@ -6,7 +6,7 @@
 [![TestPilot CI](https://github.com/pacyuzu16/testpilot/actions/workflows/testpilot.yml/badge.svg)](https://github.com/pacyuzu16/testpilot/actions/workflows/testpilot.yml)
 [![Built with IBM Bob](https://img.shields.io/badge/Built%20with-IBM%20Bob-0f62fe)](https://bob.ibm.com)
 
-**👉 See it: [pacyuzu16.github.io/testpilot](https://pacyuzu16.github.io/testpilot/)**
+**👉 See it: [live dashboard](https://pacyuzu16.github.io/testpilot/) · [▶ demo video](https://youtu.be/4TBHyhDUJ7o)**
 
 | | Before | After |
 |---|---|---|
